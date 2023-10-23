@@ -8,7 +8,7 @@ Danny wants to use the data to answer a few simple questions about his customers
 He plans on using these insights to help him decide whether he should expand the existing customer loyalty program.
 
 
-**Datasets used**
+**Datasets used** */
 Three key datasets for this case study
 
 Sales: The sales table captures all customer_id level purchases with an corresponding order_date and product_id information for when and what menu items were ordered.
