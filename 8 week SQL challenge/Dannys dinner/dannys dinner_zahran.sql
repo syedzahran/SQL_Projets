@@ -15,6 +15,17 @@ GROUP BY
 	s.customer_id
 ORDER BY 
 	total_spent DESC;
+/*
+
+Results:
+
+customer_id|total_spent|
+-----------+-----------+
+A          |         76|
+B          |         74|
+C          |         36|
+
+*/
     
 -- 2. How many days has each customer visited the restaurant?
 
@@ -27,7 +38,18 @@ GROUP BY
 	customer_id
 ORDER BY 
 	number_of_days DESC;
-    
+
+/*
+
+Results:
+
+customer_id|number_of_days|
+-----------+--------------+
+B          |             6|
+A          |             4|
+C          |             2|
+
+*/
     
 -- 3. What was the first item from the menu purchased by each customer?
 
@@ -55,7 +77,19 @@ FROM
 WHERE
 	ranking = 1;
     
-    
+    /*
+
+Results:
+
+customer_id|product_name|
+-----------+------------+
+A          |curry       |
+A          |sushi       |
+B          |curry       |
+C          |ramen       |
+
+*/
+
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
 
 SELECT
@@ -73,6 +107,15 @@ ORDER BY
 	number_purchased DESC
 LIMIT 1;
 
+/*
+
+Results:
+
+product_name|number_purchased|
+------------+----------------+
+ramen       |               8|
+
+*/
 
 -- 5. Which item was the most popular for each customer?
 
@@ -104,7 +147,21 @@ FROM
 WHERE 
 	popularity_rank = 1;
     
-    
+
+/*
+
+Results:
+
+customer_id|product_name|number_purchased|
+-----------+------------+----------------+
+A          |ramen       |               3|
+B          |curry       |               2|
+B          |sushi       |               2|
+B          |ramen       |               2|
+C          |ramen       |               3|
+
+*/
+
 -- 6. Which item was purchased first by the customer after they became a member?
 
 WITH first_member_purchase_cte AS
@@ -140,6 +197,17 @@ FROM
 WHERE 
 	purchase_rank = 1;
     
+/*
+
+Results:
+
+customer_id|join_date |order_date|product_name|
+-----------+----------+----------+------------+
+A          |2021-01-07|2021-01-07|curry       |
+B          |2021-01-09|2021-01-11|sushi       |
+
+*/
+
 
 -- 7. Which item was purchased just before the customer became a member?
 
@@ -175,7 +243,19 @@ FROM
 	last_nonmember_purchase_cte
 WHERE
 	purchase_rank = 1;
-    
+
+/*
+
+Results:
+
+customer_id|order_date|join_date |product_name|
+-----------+----------+----------+------------+
+A          |2021-01-01|2021-01-07|sushi       |
+A          |2021-01-01|2021-01-07|curry       |
+B          |2021-01-04|2021-01-09|sushi       |
+
+*/
+
 
 -- 8. What is the total items and amount spent for each member before they became a member?
 	
@@ -207,6 +287,17 @@ ORDER BY
 	customer_id;
     
 
+/*
+
+Results:
+
+customer_id|total_products|total_spent|
+-----------+--------------+-----------+
+A          |             2|         25|
+B          |             3|         40|
+
+*/
+
 -- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 
 WITH total_customer_points_cte AS
@@ -234,7 +325,18 @@ FROM
 ORDER BY
 	member_points DESC;
     
-    
+/*
+
+Results:
+
+customer|member_points|
+--------+-------------+
+B       |          940|
+A       |          860|
+C       |          360|
+
+*/
+
  -- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi 
 -- - how many points do customer A and B have at the end of January?	
    
@@ -276,7 +378,17 @@ FROM
 	jan_member_points_cte
 ORDER BY
 	customer_id;
-    
+
+/*
+
+Results:
+
+customer_id|member_points|
+-----------+-------------+
+A          |         1370|
+B          |          820|
+
+*/
     
 
 
