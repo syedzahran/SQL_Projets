@@ -20,6 +20,7 @@ Key datasets for this case study
 
 **pizza_toppings** : The table contains all of the topping_name values with their corresponding topping_id value
 
+
 **Data Clean**
 
 There are some known data issues with few tables. Data cleaning was performed and saved in temporary tables before attempting the case study.
@@ -29,6 +30,8 @@ There are some known data issues with few tables. Data cleaning was performed an
 The exclusions and extras columns in customer_orders table will need to be cleaned up before using them in the queries
 In the exclusions and extras columns, there are blank spaces and null values.
 runner_orders table
+
+**runner_orders**
 
 The pickup_time, distance, duration and cancellation columns in **runner_orders** table will need to be cleaned up before using them in the queries
 
