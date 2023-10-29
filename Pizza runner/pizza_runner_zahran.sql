@@ -74,11 +74,26 @@ FROM runner_orders_cleaned;
 
 SELECT count(*) as number_of_orders 
 FROM customer_orders_cleaned;
+/*
 
+Results:
+
+number_of_orders|
+----------------+
+              14|
+      
+*/
+	
 -- 2. How many unique customer orders were made?
 SELECT COUNT(DISTINCT order_id)
 AS unique_orders 
 FROM customer_orders_cleaned;
+/*
+
+unique_orders|
+-------------+
+           10|      
+*/
 
 -- 3. How many successful orders were delivered by each runner?
 
@@ -91,7 +106,17 @@ GROUP BY
 	runner_id
 ORDER BY
 	successful_orders DESC;
-    
+
+/*
+
+runner_id|successful_orders|
+---------+-----------------+
+        1|                4|
+        2|                3|
+        3|                1|  
+            
+*/
+
 -- 4. How many of each type of pizza was delivered?
 
 SELECT distinct pizza_name,count(pizza_name) as delivery_count
@@ -111,6 +136,16 @@ GROUP BY
 ORDER BY
   delivery_count DESC;
   
+/*
+
+pizza_name|delivery_count|
+----------+--------------+
+Meatlovers|             9|
+Vegetarian|             3|  
+            
+*/      
+        
+       
 -- 5. How many Vegetarian and Meatlovers were ordered by each customer?
 
 SELECT customer_id,
@@ -129,6 +164,19 @@ SUM(
 FROM customer_orders_cleaned
 GROUP BY customer_id;
 
+/*
+
+customer_id|meat_lovers|vegetarian|
+-----------+-----------+----------+
+        101|          2|         1|
+        102|          2|         1|
+        103|          3|         1|
+        104|          3|         0|
+        105|          0|         1|  
+            
+*/
+        
+     
 -- 6. What was the maximum number of pizzas delivered in a single order?
 
 WITH order_count_cte AS (
@@ -150,6 +198,14 @@ SELECT
   MAX(n_orders) AS max_delivered_pizzas
 FROM order_count_cte;
 
+/*
+
+max_delivered_pizzas|
+--------------------+
+                   3|  
+            
+*/
+      
 -- 7. For each customer, how many delivered pizzas had at least 1 change and how many had no changes?
 
 SELECT t1.customer_id,
@@ -171,6 +227,19 @@ USING (order_id)
 WHERE t2.cancellation IS NULL
 GROUP BY t1.customer_id;
 
+       
+/*
+
+customer_id|with_changes|without_changes|
+-----------+------------+----------+
+        101|           0|         2|
+        102|           0|         3|
+        103|           3|         0|
+        104|           2|         1|
+        105|           1|         0|  
+            
+*/
+   
 -- 8. How many pizzas were delivered that had both exclusions and extras?
 
 SELECT
@@ -188,7 +257,15 @@ ON
   t1.order_id = t2.order_id
 WHERE 
   t2.cancellation IS NULL;
-  
+
+/*
+
+number_of_pizzas|
+----------------+
+               1|  
+            
+*/      
+   
 
 -- 9. What was the total volume of pizzas ordered for each hour of the day?
 
@@ -201,6 +278,19 @@ GROUP BY
 ORDER BY 
   hour_of_day;
   
+/*
+
+hour_of_day|number_of_pizzas|
+-----------+----------------+
+11         |               1|
+13         |               3|
+18         |               3|
+19         |               1|
+21         |               3|
+23         |               3|  
+            
+*/
+   
 -- 10. What was the volume of orders for each day of the week?
 
 SELECT
@@ -212,22 +302,23 @@ GROUP BY
   day_of_week
 ORDER BY 
  DAYOFWEEK(order_time);
- 
+
+
+/*
+
+day_of_week|number_of_pizzas|
+-----------+----------------+
+Sunday     |               1|
+Monday     |               5|
+Friday     |               5|
+Saturday   |               3|  
+            
+*/
+
+
  -- Part B. Runner and Customer Experience
- 
- -- 1. Is there any relationship between the number of pizzas and how long the order takes to prepare?
- 
- SELECT t1.order_id,count(pizza_id) as number_of_pizza,
- (t2.pickup_time - t1.order_time) as prep_time
- FROM customer_orders_cleaned t1
- JOIN runner_orders_cleaned t2
- USING (order_id)
- WHERE 
-  	t2.pickup_time IS NOT NULL
- GROUP BY t1.order_id
- ORDER BY number_of_pizza;
- 
- -- 2.What was the average distance traveled for each customer?
+  
+ -- 1.What was the average distance traveled for each customer?
  
  SELECT t1.customer_id,ROUND(AVG(t2.distance),2) as distance 
  FROM customer_orders_cleaned t1
@@ -237,7 +328,20 @@ ORDER BY
   	t2.pickup_time IS NOT NULL
 GROUP BY t1.customer_id;
 
--- 3. What was the average distance traveled for each runner?
+/*
+
+customer_id|    distance|
+-----------+------------+
+        101|       20.00|
+        102|       18.40|
+        103|       23.40|
+        104|       10.00|
+        105|       25.00|
+
+*/
+
+
+-- 2. What was the average distance traveled for each runner?
 
 SELECT t2.runner_id,ROUND(AVG(t2.distance),2) as distance 
  FROM customer_orders_cleaned t1
@@ -247,8 +351,18 @@ SELECT t2.runner_id,ROUND(AVG(t2.distance),2) as distance
   	t2.pickup_time IS NOT NULL
 GROUP BY t2.runner_id;
 
+/*
+       
+runner_id|    distance|
+---------+------------+
+        1|       15.85|
+        2|       23.93|
+        3|       10.00|
+        
+*/                 
+  
 
--- 4. What was the average speed for each runner for each delivery and do you notice any trend for these values?
+-- 3. What was the average speed for each runner for each delivery and do you notice any trend for these values?
 
 WITH customer_order_count AS (
   SELECT
@@ -283,6 +397,29 @@ WHERE
 ORDER BY
   order_id;
   
+/*
+
+customer_id|order_id|runner_id|n_pizzas|distance|duration|avg_speed_kph|avg_speed_mph|
+-----------+--------+---------+--------+--------+--------+-------------+-------------+
+        101|       1|        1|       1|      20|      32|        37.50|        23.31|
+        101|       2|        1|       1|      20|      27|        44.44|        27.62|
+        102|       3|        1|       2|    13.4|      20|        40.20|        24.98|
+        103|       4|        2|       3|    23.4|      40|        35.10|        21.81|
+        104|       5|        3|       1|      10|      15|        40.00|        24.86|
+        105|       7|        2|       1|      25|      25|        60.00|        37.29|
+        102|       8|        2|       1|    23.4|      15|        93.60|        58.17|
+        104|      10|        1|       2|      10|      10|        60.00|        37.29|
+        
+*/
+
+/* 
+ * Noticable Trend
+ *  
+ * As long as weather and road conditions are not a factor, the runners are relatively slow drivers.
+ *   
+*/      
+
+
 -- Part C. Ingredient Optimization
 
 select * from pizza_recipes;
@@ -330,7 +467,17 @@ FROM
 	pizza_toppings_recipe
 GROUP BY
 	pizza_name;
-    
+
+/*
+
+pizza_name|toppings_per_pizza                                                   |
+----------+---------------------------------------------------------------------+
+Meatlovers|BBQ Sauce, Pepperoni, Cheese, Salami, Chicken, Bacon, Mushrooms, Beef|
+Vegetarian|Tomato Sauce, Cheese, Mushrooms, Onions, Peppers, Tomatoes           |
+
+*/
+
+
 -- 2. What was the most commonly added extra?
 
 DROP TABLE IF EXISTS get_extras;
@@ -369,6 +516,15 @@ ON
 ORDER BY
   total_extras DESC
 LIMIT 1;
+
+
+/*
+
+most_common_topping|
+-------------------+
+Bacon              |
+
+*/
 
 
 -- 3. What was the most common exclusion?
@@ -411,6 +567,15 @@ ORDER BY
 LIMIT 1;
 
 
+/*
+
+most_excluded_topping|
+---------------------+
+Cheese               |
+
+*/
+
+
 -- Part D. Pricing & Ratings
 
 -- 1. If a Meat Lovers pizza costs $12 and Vegetarian costs $10 and there were no charges for changes - how much money has Pizza Runner made so far if there are no delivery fees?
@@ -422,6 +587,15 @@ SELECT SUM(
    END 
    ) AS pizza_revenue_before_cancellation 
 FROM customer_orders_cleaned;
+
+    
+/*
+
+pizza_revenue_before_cancellation|
+---------------------------------+
+                              160|
+                              
+*/  
 
 -- 2. What if there was an additional $1 charge for any pizza extras?
 
@@ -470,7 +644,16 @@ WITH calculated_totals AS
   SUM(total_price) | SUM(total_extras) AS total_income
 FROM 
   calculated_totals;
-  
+     
+/*   
+
+total_income|
+------------+
+         142|
+         
+*/        
+
+
 -- 3. If a Meat Lovers pizza was $12 and Vegetarian $10 fixed prices with no cost for extras and each runner is paid $0.30 per kilometer traveled - how much money does Pizza Runner have left over after these deliveries?
 
 DROP TABLE IF EXISTS runner_orders_without_cancellation;
@@ -502,7 +685,16 @@ SELECT t1.order_id,SUM(
 )
 SELECT ROUND(SUM(total_price) - (SELECT payout FROM pay_for_runner), 2) as total_revenue
  FROM pizza_total;
- 
+
+
+/*
+
+total_revenue|
+-------------+
+       94.80 |
+       
+*/ 
+
  -- Extra Question
  
  --  1. If Danny wants to expand his range of pizzas - how would this impact the existing data design? Write an INSERT statement to demonstrate what would happen if a new Supreme pizza with all the toppings was added to the Pizza Runner menu?
@@ -541,3 +733,14 @@ JOIN
 ON
   t1.pizza_id = t2.pizza_id;
 
+	
+
+/*
+
+pizza_id|pizza_name|toppings                             |
+--------+----------+-------------------------------------+
+       1|Meatlovers|1, 2, 3, 4, 5, 6, 8, 10              |
+       2|Vegetarian|4, 6, 7, 9, 11, 12                   |
+       3|Supreme   |1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12|
+
+*/
